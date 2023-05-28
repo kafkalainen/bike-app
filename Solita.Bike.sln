@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Solita.Bike.Api", "Solita.Bike.Api\Solita.Bike.Api.csproj", "{473619E4-6234-4E41-B33E-57FE8E77812B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Solita.Bike.Shared", "Solita.Bike.Shared\Solita.Bike.Shared.csproj", "{6F4D0152-FCF8-4330-8079-06D8BA7095D8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Solita.Bike.Database", "Solita.Bike.Database\Solita.Bike.Database.csproj", "{14348BB3-3B6B-42AC-B490-E3CD0D9FC2AF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{473619E4-6234-4E41-B33E-57FE8E77812B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{473619E4-6234-4E41-B33E-57FE8E77812B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{473619E4-6234-4E41-B33E-57FE8E77812B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{473619E4-6234-4E41-B33E-57FE8E77812B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F4D0152-FCF8-4330-8079-06D8BA7095D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F4D0152-FCF8-4330-8079-06D8BA7095D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F4D0152-FCF8-4330-8079-06D8BA7095D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F4D0152-FCF8-4330-8079-06D8BA7095D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14348BB3-3B6B-42AC-B490-E3CD0D9FC2AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14348BB3-3B6B-42AC-B490-E3CD0D9FC2AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14348BB3-3B6B-42AC-B490-E3CD0D9FC2AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14348BB3-3B6B-42AC-B490-E3CD0D9FC2AF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

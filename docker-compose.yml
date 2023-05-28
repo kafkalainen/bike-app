@@ -1,0 +1,45 @@
+version: '3.9'
+
+volumes:
+  data:
+
+services:
+  database:
+    image: mysql:8.0.32
+    ports:
+      - "30078:3306"
+    volumes:
+      - "./data:/var/lib/mysql"
+      - "./init:/docker-entrypoint-initdb.d"
+    restart: always
+    env_file:
+      - .env
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
+  
+  seed:
+    build:
+      context: .
+      dockerfile: Dockerfile-seed
+    depends_on:
+      database:
+        condition: service_healthy
+    env_file:
+      - .env
+  
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile-api
+    depends_on:
+      database:
+        condition: service_healthy
+      seed:
+        condition: service_completed_successfully
+    ports:
+      - "5783:80"
+    restart: always
+    env_file:
+      - .env
