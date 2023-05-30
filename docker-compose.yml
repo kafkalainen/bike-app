@@ -43,3 +43,14 @@ services:
     restart: always
     env_file:
       - .env
+        
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile-app
+    depends_on:
+      api:
+        condition: service_started
+    ports:
+      - "2341:80"
+    restart: always
