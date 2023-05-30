@@ -5,6 +5,7 @@ using Solita.Bike.Shared;
 using Solita.Bike.Shared.Dtos;
 using Solita.Bike.Shared.Models;
 using Solita.Bike.Shared.Profiles;
+using Solita.Bike.Shared.Responses;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<BikeDbContext>();
@@ -16,8 +17,7 @@ var app = builder.Build();
 var mapper = app.Services.GetService<IMapper>();
 if (mapper == null)
 {
-    throw new InvalidOperationException(
-        "Mapper not found");
+    throw new InvalidOperationException($"Couldn't resolve service {nameof(IMapper)}");
 }
 
 if (app.Environment.IsDevelopment())
