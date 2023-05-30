@@ -1,0 +1,48 @@
+﻿@page "/journeys"
+@using Solita.Bike.App.Data
+@using Solita.Bike.Shared.Responses
+@inject BikeService BikeService
+
+<PageTitle>Journeys</PageTitle>
+
+<h1>Journeys</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (m_journeyResponse == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Departure Station: </th>
+                <th>Return Station: </th>
+                <th>Distance: </th>
+                <th>DurationInMinutes: </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var journey in m_journeyResponse.Response)
+            {
+                <tr>
+                    <td>@journey.DepartureStation</td>
+                    <td>@journey.ReturnStation</td>
+                    <td>@journey.CoveredDistanceInKilometers</td>
+                    <td>@journey.DurationInMinutes</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private JourneyResponse? m_journeyResponse;
+
+    protected override async Task OnInitializedAsync()
+    {
+        m_journeyResponse = await BikeService.GetJourneys();
+    }
+}
