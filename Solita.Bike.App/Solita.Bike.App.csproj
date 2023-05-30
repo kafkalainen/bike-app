@@ -10,4 +10,8 @@
     <ProjectReference Include="..\Solita.Bike.Shared\Solita.Bike.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Blazored.Modal" Version="7.1.0" />
+  </ItemGroup>
+
 </Project>
