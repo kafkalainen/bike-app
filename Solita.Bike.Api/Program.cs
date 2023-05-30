@@ -29,15 +29,16 @@ if (app.Environment.IsDevelopment())
 app.MapGet("bike/api/journeys", async ([AsParameters]QueryParameters parameters, BikeDbContext db) =>
 {
     var pagedResult = await PaginatedList<Journey>.CreateAsync(db.Journeys, parameters.PageNumber, parameters.PageSize);
+    var list = mapper.Map<PaginatedList<JourneyInfo>>(pagedResult);
     var paginationMetadata = new PaginationMetadata
     {
-        PageNumber = pagedResult.PageIndex,
-        PageSize = pagedResult.PageSize,
-        TotalPages = pagedResult.TotalPages,
-        
+        PageNumber = list.PageIndex,
+        PageSize = list.PageSize,
+        TotalPages = list.TotalPages,
+        HasPreviousPage = list.HasPreviousPage,
+        HasNextPage = list.HasNextPage
     };
-    var list = mapper.Map<PaginatedList<JourneyInfo>>(pagedResult);
-    return Results.Ok( new { Pagination = paginationMetadata, Result = list });
+    return Results.Ok( new JourneyResponse(){ Pagination = paginationMetadata, Response = list });
 }).WithName("Journeys").WithOpenApi();
 
 app.MapGet("bike/api/stations", async ([AsParameters]QueryParameters parameters, BikeDbContext db) =>
