@@ -41,7 +41,7 @@ app.MapGet("bike/api/journeys", async ([AsParameters]QueryParameters parameters,
     return Results.Ok( new JourneyResponse(){ Pagination = paginationMetadata, Response = list });
 }).WithName("Journeys").WithOpenApi();
 
-app.MapGet("bike/api/stations", async ([AsParameters]QueryParameters parameters, BikeDbContext db) =>
+app.MapGet("bike/api/stations", async ([AsParameters] QueryParameters parameters, BikeDbContext db) =>
 {
     var pagedResult = await PaginatedList<Station>.CreateAsync(db.Stations, parameters.PageNumber, parameters.PageSize);
     var list = mapper.Map<List<StationInfo>>(pagedResult);
@@ -56,23 +56,22 @@ app.MapGet("bike/api/stations", async ([AsParameters]QueryParameters parameters,
     return Results.Ok(new StationResponse { Pagination = paginationMetadata, Response = list });
 }).WithName("Stations").WithOpenApi();
 
-
 app.MapGet("bike/api/stations/{id}", async (string id, BikeDbContext db) =>
 {
     var result = await db.Stations
         .Where(s => s.Id == id)
         .Select(s => new SingleStationInfo
         {
-            Name = new List<Localization>
+            Name = new Dictionary<Localization, string?>
             {
-                new() { Identifier = "fi", Value = s.NameInFinnish },
-                new() { Identifier = "sv", Value = s.NameInSwedish },
-                new() { Identifier = "en", Value = s.NameInEnglish }
+                { Localization.Fi, s.NameInFinnish },
+                { Localization.Sv, s.NameInSwedish },
+                { Localization.En, s.NameInEnglish }
             },
-            Address = new List<Localization>
+            Address = new Dictionary<Localization, string?>
             {
-                new() { Identifier = "fi", Value = s.AddressInFinnish },
-                new() { Identifier = "sv", Value = s.AddressInSwedish }
+                { Localization.Fi, s.AddressInFinnish },
+                { Localization.Sv, s.AddressInSwedish }
             },
             StartJourneyTotal = (ulong)s.DepartureJourneys.Count(),
             EndJourneyTotal = (ulong)s.ReturnJourneys.Count()
