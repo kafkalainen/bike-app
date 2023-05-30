@@ -1,0 +1,69 @@
+﻿@page "/journeys"
+@using Solita.Bike.App.Data
+@using Solita.Bike.Shared.Responses
+@inject BikeService BikeService
+
+<PageTitle>Journeys</PageTitle>
+
+<h1>Journeys</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (m_journeyResponse == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Departure Station: </th>
+            <th>Return Station: </th>
+            <th>Distance: </th>
+            <th>DurationInMinutes: </th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var journey in m_journeyResponse.Response)
+        {
+            <tr>
+                <td>@journey.DepartureStation</td>
+                <td>@journey.ReturnStation</td>
+                <td>@journey.CoveredDistanceInKilometers</td>
+                <td>@journey.DurationInMinutes</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    <div class="btn-lg">@m_journeyResponse.Pagination.PageNumber/@m_journeyResponse.Pagination.TotalPages</div>
+    <div>
+        @if (m_journeyResponse.Pagination.HasPreviousPage)
+        {
+            <button class="btn-lg btn" @onclick="OnPreviousPage">Previous</button>
+        }
+        @if (m_journeyResponse.Pagination.HasNextPage)
+        {
+            <button class="btn-lg btn" @onclick="OnNextPage">Next</button>
+        }
+    </div>
+}
+
+@code {
+    private JourneyResponse? m_journeyResponse;
+
+    protected override async Task OnInitializedAsync()
+    {
+        m_journeyResponse = await BikeService.GetJourneys();
+    }
+
+    private async Task OnNextPage()
+    {
+        m_journeyResponse = await BikeService.GetJourneys(m_journeyResponse!.Pagination.PageNumber + 1);
+    }
+    
+    private async Task OnPreviousPage()
+    {
+        m_journeyResponse = await BikeService.GetJourneys(m_journeyResponse!.Pagination.PageNumber - 1);
+    }
+}

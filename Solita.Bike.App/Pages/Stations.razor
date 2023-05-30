@@ -1,15 +1,16 @@
-﻿@page "/journeys"
+﻿@page "/stations"
 @using Solita.Bike.App.Data
+@using Solita.Bike.Shared.Dtos
 @using Solita.Bike.Shared.Responses
 @inject BikeService BikeService
 
-<PageTitle>Journeys</PageTitle>
+<PageTitle>Stations</PageTitle>
 
-<h1>Journeys</h1>
+<h1>Stations</h1>
 
-<p>This component demonstrates fetching data from a service.</p>
+<p>Fetching stations from the backend service</p>
 
-@if (m_journeyResponse == null)
+@if (m_stationResponse == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -17,32 +18,62 @@ else
 {
     <table class="table">
         <thead>
-            <tr>
-                <th>Departure Station: </th>
-                <th>Return Station: </th>
-                <th>Distance: </th>
-                <th>DurationInMinutes: </th>
-            </tr>
+        <tr>
+            <th>Station ID: </th>
+            <th>Name: </th>
+            <th>Address: </th>
+            <th>City: </th>
+            <th>Operator: </th>
+            <th>Capacity: </th>
+            <th>Coordinates: </th>
+        </tr>
         </thead>
         <tbody>
-            @foreach (var journey in m_journeyResponse.Response)
-            {
-                <tr>
-                    <td>@journey.DepartureStation</td>
-                    <td>@journey.ReturnStation</td>
-                    <td>@journey.CoveredDistanceInKilometers</td>
-                    <td>@journey.DurationInMinutes</td>
-                </tr>
-            }
+        @foreach (var station in m_stationResponse.Response)
+        {
+            station.Name!.TryGetValue(Localization.Fi, out var name);
+            station.Address!.TryGetValue(Localization.Fi, out var address);
+            station.City!.TryGetValue(Localization.Fi, out var city);
+            <tr>
+                <td>@station.Id</td>
+                <td>@name</td>
+                <td>@address</td>
+                <td>@city</td>
+                <td>@station.Operator</td>
+                <td>@station.Capacity</td>
+                <td>@station.X, @station.Y</td>
+            </tr>
+        }
         </tbody>
     </table>
+    <div class="btn-lg">@m_stationResponse.Pagination.PageNumber/@m_stationResponse.Pagination.TotalPages</div>
+    <div>
+        @if (m_stationResponse.Pagination.HasPreviousPage)
+        {
+            <button class="btn-lg btn" @onclick="OnPreviousPage">Previous</button>
+        }
+        @if (m_stationResponse.Pagination.HasNextPage)
+        {
+            <button class="btn-lg btn" @onclick="OnNextPage">Next</button>
+        }
+    </div>
 }
 
 @code {
-    private JourneyResponse? m_journeyResponse;
+    private StationResponse? m_stationResponse;
 
     protected override async Task OnInitializedAsync()
     {
-        m_journeyResponse = await BikeService.GetJourneys();
+        m_stationResponse = await BikeService.GetStations();
+    }
+    
+    private async Task OnNextPage()
+    {
+        m_stationResponse = await BikeService.GetStations(m_stationResponse!.Pagination.PageNumber + 1);
+    }
+    
+    private async Task OnPreviousPage()
+    {
+        m_stationResponse = await BikeService.GetStations(m_stationResponse!.Pagination.PageNumber - 1);
     }
 }
