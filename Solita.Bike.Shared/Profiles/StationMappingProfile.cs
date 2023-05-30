@@ -11,18 +11,18 @@ public class StationMappingProfile : Profile
         CreateMap<Station, SingleStationInfo>()
             .ForMember(dest => dest.Name,
                 opt => opt.MapFrom(src =>
-                    new List<Localization>
+                    new Dictionary<Localization, string?>
                     {
-                        new() { Identifier = "fi", Value = src.NameInFinnish },
-                        new() { Identifier = "en", Value = src.NameInEnglish },
-                        new() { Identifier = "se", Value = src.NameInSwedish }
+                        { Localization.Fi, src.NameInFinnish },
+                        { Localization.Sv, src.NameInSwedish },
+                        { Localization.En, src.NameInEnglish }
                     }))
             .ForMember(dest => dest.Address,
                 opt => opt.MapFrom(src =>
-                    new List<Localization>
+                    new Dictionary<Localization, string?>
                     {
-                        new() { Identifier = "fi", Value = src.AddressInFinnish },
-                        new() { Identifier = "en", Value = src.AddressInSwedish }
+                        { Localization.Fi, src.AddressInFinnish },
+                        { Localization.Sv, src.AddressInSwedish }
                     }))
             .ForMember(dest => dest.StartJourneyTotal,
                 opt => opt.MapFrom(src =>
@@ -34,25 +34,25 @@ public class StationMappingProfile : Profile
         CreateMap<Station, StationInfo>()
             .ForMember(dest => dest.Name,
                 opt => opt.MapFrom(src =>
-                    new List<Localization>
+                    new Dictionary<Localization, string?>
                     {
-                        new() { Identifier = "fi", Value = src.NameInFinnish },
-                        new() { Identifier = "en", Value = src.NameInEnglish },
-                        new() { Identifier = "se", Value = src.NameInSwedish }
+                        { Localization.Fi, src.NameInFinnish },
+                        { Localization.Sv, src.NameInSwedish },
+                        { Localization.En, src.NameInEnglish }
                     }))
             .ForMember(dest => dest.Address,
                 opt => opt.MapFrom(src =>
-                    new List<Localization>
+                    new Dictionary<Localization, string?>
                     {
-                        new() { Identifier = "fi", Value = src.AddressInFinnish },
-                        new() { Identifier = "se", Value = src.AddressInSwedish }
+                        { Localization.Fi, src.AddressInFinnish },
+                        { Localization.Sv, src.AddressInSwedish }
                     }))
             .ForMember(dest => dest.City,
                 opt => opt.MapFrom(src =>
-                    new List<Localization>
+                    new Dictionary<Localization, string?>
                     {
-                        new() { Identifier = "fi", Value = src.CityInFinnish },
-                        new() { Identifier = "se", Value = src.CityInSwedish }
+                        { Localization.Fi, src.CityInFinnish },
+                        { Localization.Sv, src.CityInSwedish }
                     }))
             .ForMember(dest => dest.Operator,
                 opt => opt.MapFrom(src =>
