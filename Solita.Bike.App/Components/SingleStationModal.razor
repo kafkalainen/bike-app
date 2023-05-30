@@ -7,8 +7,8 @@
    }
    else
    {
-      <p>Name: @SingleStationInfo.Name</p>
-      <p>Address: @SingleStationInfo.Address</p>
+      <p>Name: @m_name</p>
+      <p>Address: @m_address</p>
       <p>Start journey total: @SingleStationInfo.StartJourneyTotal</p>
       <p>End journey total: @SingleStationInfo.EndJourneyTotal</p>
    }
@@ -20,6 +20,18 @@
    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
 
    [Parameter] public SingleStationInfo? SingleStationInfo { get; set; }
+   private string? m_name;
+   private string? m_address;
+
+   protected override void OnInitialized()
+   {
+      if (SingleStationInfo == null)
+      {
+         return;
+      }
+      SingleStationInfo.Name.TryGetValue(Localization.Fi, out m_name);
+      SingleStationInfo.Address.TryGetValue(Localization.Fi, out m_address);
+   }
 
    private async Task Close() => await BlazoredModal.CloseAsync();
 }
