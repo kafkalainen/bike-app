@@ -8,9 +8,6 @@ public class BikeService
 {
     private readonly HttpClient m_httpClient;
 
-    public List<JourneyInfo>? JourneyInfos { get; set; }
-    public PaginationMetadata? Metadata;
-
     public BikeService(HttpClient httpClient)
     {
         m_httpClient = httpClient;
@@ -30,6 +27,17 @@ public class BikeService
     public async Task<StationResponse> GetStations(int pageNumber = 1, int pageSize = 10)
     {
         var response = await m_httpClient.GetFromJsonAsync<StationResponse>($"http://localhost:5783/bike/api/stations?pageNumber={pageNumber}&PageSize={pageSize}");
+        if (response == null)
+        {
+            throw new Exception("Response was null");
+        }
+
+        return response;
+    }
+    
+    public async Task<SingleStationInfo> GetStation(int id)
+    {
+        var response = await m_httpClient.GetFromJsonAsync<SingleStationInfo>($"http://localhost:5783/bike/api/stations/{id}");
         if (response == null)
         {
             throw new Exception("Response was null");
