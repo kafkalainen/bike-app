@@ -42,7 +42,7 @@ else
                 <td>@station.Operator</td>
                 <td>@station.Capacity</td>
                 <td>@station.X, @station.Y</td>
-                <td><button class="btn-lg btn" @onclick="() => ShowModal(station.Id)">View</button></td>
+                <td><button class="btn-lg btn" @onclick="() => ShowModal(station.Id!)">View</button></td>
             </tr>
         }
         </tbody>
@@ -80,7 +80,7 @@ else
         m_stationResponse = await BikeService.GetStations(m_stationResponse!.Pagination.PageNumber - 1);
     }
 
-    private async Task ShowModal(int id)
+    private async Task ShowModal(string id)
     {
         m_stationInfo = await BikeService.GetStation(id);
         var parameters = new ModalParameters()
