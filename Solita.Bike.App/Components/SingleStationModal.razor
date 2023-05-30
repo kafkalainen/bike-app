@@ -1,0 +1,25 @@
+@using Solita.Bike.Shared.Dtos
+
+<div>
+   @if (SingleStationInfo == null)
+   {
+      <p>No data available.</p>
+   }
+   else
+   {
+      <p>Name: @SingleStationInfo.Name</p>
+      <p>Address: @SingleStationInfo.Address</p>
+      <p>Start journey total: @SingleStationInfo.StartJourneyTotal</p>
+      <p>End journey total: @SingleStationInfo.EndJourneyTotal</p>
+   }
+   <button @onclick="Close">Close</button>
+</div>
+
+@code {
+   
+   [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+
+   [Parameter] public SingleStationInfo? SingleStationInfo { get; set; }
+
+   private async Task Close() => await BlazoredModal.CloseAsync();
+}
