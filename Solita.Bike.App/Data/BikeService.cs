@@ -35,7 +35,7 @@ public class BikeService
         return response;
     }
     
-    public async Task<SingleStationInfo> GetStation(int id)
+    public async Task<SingleStationInfo> GetStation(string id)
     {
         var response = await m_httpClient.GetFromJsonAsync<SingleStationInfo>($"http://localhost:5783/bike/api/stations/{id}");
         if (response == null)
