@@ -32,11 +32,11 @@ app.MapGet("bike/api/journeys", async ([AsParameters]QueryParameters parameters,
     var list = mapper.Map<PaginatedList<JourneyInfo>>(pagedResult);
     var paginationMetadata = new PaginationMetadata
     {
-        PageNumber = list.PageIndex,
-        PageSize = list.PageSize,
-        TotalPages = list.TotalPages,
-        HasPreviousPage = list.HasPreviousPage,
-        HasNextPage = list.HasNextPage
+        PageNumber = pagedResult.PageIndex,
+        PageSize = pagedResult.PageSize,
+        TotalPages = pagedResult.TotalPages,
+        HasPreviousPage = pagedResult.HasPreviousPage,
+        HasNextPage = pagedResult.HasNextPage
     };
     return Results.Ok( new JourneyResponse(){ Pagination = paginationMetadata, Response = list });
 }).WithName("Journeys").WithOpenApi();
