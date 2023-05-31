@@ -5,10 +5,16 @@ EXPOSE 80/tcp
 FROM mcr.microsoft.com/dotnet/sdk:7.0-alpine AS build
 WORKDIR /src
 
+COPY ./Solita.Bike.Database ./Solita.Bike.Database
+COPY ./Solita.Bike.Profiles ./Solita.Bike.Profiles
 COPY ./Solita.Bike.Shared ./Solita.Bike.Shared
+COPY ./Solita.Bike.Models ./Solita.Bike.Models
 COPY ./Solita.Bike.Api ./Solita.Bike.Api
 
+RUN dotnet restore "Solita.Bike.Database/Solita.Bike.Database.csproj"
+RUN dotnet restore "Solita.Bike.Profiles/Solita.Bike.Profiles.csproj"
 RUN dotnet restore "Solita.Bike.Shared/Solita.Bike.Shared.csproj"
+RUN dotnet restore "Solita.Bike.Models/Solita.Bike.Models.csproj"
 RUN dotnet restore "Solita.Bike.Api/Solita.Bike.Api.csproj"
 
 WORKDIR "/src/."
