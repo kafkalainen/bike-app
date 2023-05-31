@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Solita.Bike.Api;
 using Solita.Bike.Database;
 using Solita.Bike.Models;
+using Solita.Bike.Profiles;
 using Solita.Bike.Shared;
 using Solita.Bike.Shared.Dtos;
-using Solita.Bike.Shared.Profiles;
 using Solita.Bike.Shared.Responses;
 
 var builder = WebApplication.CreateBuilder(args);
