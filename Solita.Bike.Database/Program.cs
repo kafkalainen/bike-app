@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using CsvHelper;
+using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using Solita.Bike.Database;
-using Solita.Bike.Shared;
-using Solita.Bike.Shared.Models;
+using Solita.Bike.Models;
 
 var downloader = new FileDownloader();
 var downloadTasks = new List<Task>
@@ -22,14 +22,17 @@ var downloadTasks = new List<Task>
 
 await Task.WhenAll(downloadTasks);
 
-await using var context = new BikeDbContext();
-await ImportStations(context);
-await ImportJourneys(context);
 
-async Task ImportStations(BikeDbContext dbContext)
+await ImportStations();
+await ImportJourneys();
+
+Console.WriteLine("All data has been successfully imported.");
+
+async Task ImportStations()
 {
     foreach (var file in Directory.GetFiles("Data/Stations"))
     {
+        await using var dbContext = new BikeDbContext();
         if (dbContext.DataImports.Any(di => di.FileName == file))
         {
             Console.WriteLine($"Data from {file} has already been imported. Skipping.");
@@ -67,10 +70,12 @@ async Task ImportStations(BikeDbContext dbContext)
     }
 }
 
-async Task ImportJourneys(BikeDbContext dbContext)
+async Task ImportJourneys()
 {
     foreach (var file in Directory.GetFiles("Data/Journeys"))
     {
+        Console.WriteLine($"Importing: {file}");
+        await using var dbContext = new BikeDbContext();
         if (dbContext.DataImports.Any(di => di.FileName == file))
         {
             Console.WriteLine($"Data from {file} has already been imported. Skipping.");
@@ -79,8 +84,13 @@ async Task ImportJourneys(BikeDbContext dbContext)
     
         using var reader = new StreamReader(file);
         using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-        var records = csv.GetRecords<JourneyRecord>();
+        var records = csv.GetRecords<JourneyRecord>().ToList();
         
+        var batchSize = 100000;
+        var journeys = new List<Journey>();
+        var importedCount = 0;
+        var startTime = DateTime.UtcNow;
+
         foreach (var record in records)
         {
             var journey = new Journey
@@ -96,36 +106,63 @@ async Task ImportJourneys(BikeDbContext dbContext)
             };
             var validationResults = new List<ValidationResult>();
             var validationContext = new ValidationContext(journey);
-    
+
             if (!Validator.TryValidateObject(journey, validationContext, validationResults, true))
             {
                 continue;
             }
-            
-            await dbContext.Journeys.AddAsync(journey);
-        }
-    
-        await dbContext.DataImports.AddAsync(new DataImport { FileName = file, ImportDate = DateTime.UtcNow });
-        try
-        {
-            dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
-            await dbContext.SaveChangesAsync();
-            dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
-        }
-        catch (DbUpdateException e)
-        {
-            Console.WriteLine(e);
-            foreach (var entry in e.Entries)
+
+            var departureIsInStations = await ValidateForeignKeyAsync(dbContext, journey.DepartureStationId!);
+            var returnIsInStations = await ValidateForeignKeyAsync(dbContext, journey.ReturnStationId!);
+            if (!departureIsInStations || !returnIsInStations)
             {
-                Console.WriteLine($"Entity Type: {entry.Entity.GetType().Name}");
-                foreach (var property in entry.Properties)
+                continue;
+            }
+            
+            journeys.Add(journey);
+            importedCount++;
+
+            if (journeys.Count < batchSize && importedCount != records.Count)
+            {
+                continue;
+            }
+            
+            await using var innerDbContext = new BikeDbContext();
+            await innerDbContext.Journeys.AddRangeAsync(journeys);
+            try
+            {
+                await innerDbContext.BulkSaveChangesAsync();
+            }
+            catch (DbUpdateException e)
+            {
+                foreach (var entry in e.Entries)
                 {
-                    Console.WriteLine($"Property: {property.Metadata.Name}, Value: {property.CurrentValue}");
+                    Console.WriteLine($"Entity Type: {entry.Entity.GetType().Name}");
+                    foreach (var property in entry.Properties)
+                    {
+                        Console.WriteLine($"Property: {property.Metadata.Name}, Value: {property.CurrentValue}");
+                    }
                 }
             }
+            finally
+            {
+                journeys.Clear();
+                var elapsedSeconds = (DateTime.UtcNow - startTime).TotalSeconds;
+                var averageTimePerRecord = elapsedSeconds / importedCount;
+                var remainingCount = records.Count - importedCount;
+                var estimatedTimeLeft = TimeSpan.FromSeconds(averageTimePerRecord * remainingCount);
+                Console.WriteLine($"Batch imported. Total imported: {importedCount/(double)records.Count * 100}%");
+                Console.WriteLine($"Estimated time left: {estimatedTimeLeft}");
+            }
         }
+        await dbContext.DataImports.AddAsync(new DataImport { FileName = file, ImportDate = DateTime.UtcNow });
+        await dbContext.SaveChangesAsync();
         Console.WriteLine($"Data from {file} has been imported.");
     }
 }
 
-Console.WriteLine("All data has been successfully imported.");
+async Task<bool> ValidateForeignKeyAsync(BikeDbContext dbContext, string stationId)
+{
+    var result = await dbContext.Stations.AnyAsync(s => s.Id == stationId);
+    return result;
+}
