@@ -17,16 +17,17 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="**\*.csv">
+        <Content Include="Data\**">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Include="obj\Data\Journeys\2021-05.csv" />
-        <None Include="obj\Data\Journeys\2021-06.csv" />
-        <None Include="obj\Data\Journeys\2021-07.csv" />
-        <None Include="obj\Data\Stations\Helsingin_ja_Espoon_kaupunkipyöräasemat_avoin.csv" />
+        </Content>
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Solita.Bike.Shared\Solita.Bike.Shared.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Data\Journeys" />
+      <Folder Include="Data\Stations" />
     </ItemGroup>
 </Project>
