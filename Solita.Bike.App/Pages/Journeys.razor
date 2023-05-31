@@ -7,7 +7,7 @@
 
 <h1>Journeys</h1>
 
-<p>This component demonstrates fetching data from a service.</p>
+<p>Fetching journeys from the backend service</p>
 
 @if (m_journeyResponse == null)
 {
@@ -25,7 +25,7 @@ else
         </tr>
         </thead>
         <tbody>
-        @foreach (var journey in m_journeyResponse.Response)
+        @foreach (var journey in m_journeyResponse!.Response!)
         {
             <tr>
                 <td>@journey.DepartureStation</td>
@@ -37,7 +37,7 @@ else
         </tbody>
     </table>
     <div>
-        @if (m_journeyResponse.Pagination.HasPreviousPage)
+        @if (m_journeyResponse.Pagination!.HasPreviousPage)
         {
             <button class="btn-lg btn" @onclick="OnPreviousPage">Previous</button>
         }
@@ -64,17 +64,17 @@ else
 
     private async Task OnNextPage()
     {
-        m_journeyResponse = await BikeService.GetJourneys(m_journeyResponse!.Pagination.PageNumber + 1);
+        m_journeyResponse = await BikeService.GetJourneys(m_journeyResponse!.Pagination!.PageNumber + 1);
     }
     
     private async Task OnPreviousPage()
     {
-        m_journeyResponse = await BikeService.GetJourneys(m_journeyResponse!.Pagination.PageNumber - 1);
+        m_journeyResponse = await BikeService.GetJourneys(m_journeyResponse!.Pagination!.PageNumber - 1);
     }
     
     private async Task OnPageResize()
     {
-        m_journeyResponse = await BikeService.GetJourneys(m_journeyResponse!.Pagination.PageNumber, PageSize);
-        PageSize = m_journeyResponse.Pagination.PageSize;
+        m_journeyResponse = await BikeService.GetJourneys(m_journeyResponse!.Pagination!.PageNumber, PageSize);
+        PageSize = m_journeyResponse.Pagination!.PageSize;
     }
 }

@@ -29,7 +29,7 @@ else
         </tr>
         </thead>
         <tbody>
-        @foreach (var station in m_stationResponse.Response)
+        @foreach (var station in m_stationResponse.Response!)
         {
             station.Name!.TryGetValue(Localization.Fi, out var name);
             station.Address!.TryGetValue(Localization.Fi, out var address);
@@ -48,7 +48,7 @@ else
         </tbody>
     </table>
     <div>
-        @if (m_stationResponse.Pagination.HasPreviousPage)
+        @if (m_stationResponse!.Pagination!.HasPreviousPage)
         {
             <button class="btn-lg btn" @onclick="OnPreviousPage">Previous</button>
         }
@@ -74,23 +74,23 @@ else
     protected override async Task OnInitializedAsync()
     {
         m_stationResponse = await BikeService.GetStations();
-        PageSize = m_stationResponse.Pagination.PageSize;
+        PageSize = m_stationResponse!.Pagination!.PageSize;
     }
     
     private async Task OnNextPage()
     {
-        m_stationResponse = await BikeService.GetStations(m_stationResponse!.Pagination.PageNumber + 1, PageSize);
+        m_stationResponse = await BikeService.GetStations(m_stationResponse!.Pagination!.PageNumber + 1, PageSize);
     }
     
     private async Task OnPreviousPage()
     {
-        m_stationResponse = await BikeService.GetStations(m_stationResponse!.Pagination.PageNumber - 1, PageSize);
+        m_stationResponse = await BikeService.GetStations(m_stationResponse!.Pagination!.PageNumber - 1, PageSize);
     }
 
     private async Task OnPageResize()
     {
-        m_stationResponse = await BikeService.GetStations(m_stationResponse!.Pagination.PageNumber, PageSize);
-        PageSize = m_stationResponse.Pagination.PageSize;
+        m_stationResponse = await BikeService.GetStations(m_stationResponse!.Pagination!.PageNumber, PageSize);
+        PageSize = m_stationResponse.Pagination!.PageSize;
     }
 
     private async Task ShowModal(string id)
