@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Solita.Bike.Shared.Models;
+namespace Solita.Bike.Models;
 
 public class DataImport
 {

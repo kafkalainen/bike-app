@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Solita.Bike.Shared.Models;
+namespace Solita.Bike.Models;
 
 public class Journey
 {

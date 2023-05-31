@@ -1,8 +1,8 @@
-namespace Solita.Bike.Shared
+using Microsoft.EntityFrameworkCore;
+using Solita.Bike.Models;
+
+namespace Solita.Bike.Database
 {
-    using Microsoft.EntityFrameworkCore;
-    using Models;
-    
     public class BikeDbContext : DbContext
     {
         public DbSet<Station> Stations => Set<Station>();
