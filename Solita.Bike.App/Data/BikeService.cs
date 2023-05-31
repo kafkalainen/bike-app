@@ -1,4 +1,3 @@
-using Solita.Bike.Shared;
 using Solita.Bike.Shared.Dtos;
 using Solita.Bike.Shared.Responses;
 
@@ -6,16 +5,15 @@ namespace Solita.Bike.App.Data;
 
 public class BikeService
 {
-    private readonly HttpClient m_httpClient;
+    private readonly IHttpClientFactory m_httpClientFactory;
 
-    public BikeService(HttpClient httpClient)
-    {
-        m_httpClient = httpClient;
-    }
+    public BikeService(IHttpClientFactory httpClientFactory) =>
+        m_httpClientFactory = httpClientFactory;
 
     public async Task<JourneyResponse> GetJourneys(int pageNumber = 1, int pageSize = 10)
     {
-        var response = await m_httpClient.GetFromJsonAsync<JourneyResponse>($"http://localhost:5783/bike/api/journeys?pageNumber={pageNumber}&PageSize={pageSize}");
+        var client = m_httpClientFactory.CreateClient("BikeService");
+        var response = await client.GetFromJsonAsync<JourneyResponse>($"bike/api/journeys?pageNumber={pageNumber}&PageSize={pageSize}");
         if (response == null)
         {
             throw new Exception("Response was null");
@@ -26,7 +24,8 @@ public class BikeService
     
     public async Task<StationResponse> GetStations(int pageNumber = 1, int pageSize = 10)
     {
-        var response = await m_httpClient.GetFromJsonAsync<StationResponse>($"http://localhost:5783/bike/api/stations?pageNumber={pageNumber}&PageSize={pageSize}");
+        var client = m_httpClientFactory.CreateClient("BikeService");
+        var response = await client.GetFromJsonAsync<StationResponse>($"bike/api/stations?pageNumber={pageNumber}&PageSize={pageSize}");
         if (response == null)
         {
             throw new Exception("Response was null");
@@ -37,7 +36,8 @@ public class BikeService
     
     public async Task<SingleStationInfo> GetStation(string id)
     {
-        var response = await m_httpClient.GetFromJsonAsync<SingleStationInfo>($"http://localhost:5783/bike/api/stations/{id}");
+        var client = m_httpClientFactory.CreateClient("BikeService");
+        var response = await client.GetFromJsonAsync<SingleStationInfo>($"bike/api/stations/{id}");
         if (response == null)
         {
             throw new Exception("Response was null");

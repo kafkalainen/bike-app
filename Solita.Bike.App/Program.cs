@@ -6,7 +6,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddBlazoredModal();
-builder.Services.AddHttpClient();
+builder.Services.AddHttpClient("BikeService", httpClient =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("BikeService");
+    httpClient.BaseAddress = new Uri(connectionString ?? throw new Exception("No connection string was given."));
+});
 builder.Services.AddSingleton<BikeService>();
 
 var app = builder.Build();
