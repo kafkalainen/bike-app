@@ -1,6 +1,7 @@
 using AutoMapper;
+using Solita.Bike.Shared;
 
-namespace Solita.Bike.Shared.Profiles;
+namespace Solita.Bike.Profiles;
 
 public class PaginatedListProfile : Profile
 {

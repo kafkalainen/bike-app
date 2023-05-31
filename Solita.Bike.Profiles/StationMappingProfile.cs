@@ -1,8 +1,9 @@
 using AutoMapper;
+using Solita.Bike.Models;
+using Solita.Bike.Shared;
 using Solita.Bike.Shared.Dtos;
-using Solita.Bike.Shared.Models;
 
-namespace Solita.Bike.Shared.Profiles;
+namespace Solita.Bike.Profiles;
 
 public class StationMappingProfile : Profile
 {

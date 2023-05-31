@@ -1,6 +1,7 @@
 using AutoMapper;
+using Solita.Bike.Shared;
 
-namespace Solita.Bike.Shared;
+namespace Solita.Bike.Profiles;
 
 public class PaginatedListConverter<TSource, TDestination> : ITypeConverter<PaginatedList<TSource>, PaginatedList<TDestination>>
 {
