@@ -12,6 +12,8 @@ services:
       - "./data:/var/lib/mysql"
       - "./init:/docker-entrypoint-initdb.d"
     restart: always
+    command:
+      - --local_infile=1
     env_file:
       - .env
     healthcheck:
