@@ -16,8 +16,10 @@ public class FileDownloader
     {
         if (File.Exists(savePath))
         {
-            Console.WriteLine($"File exists in {savePath}, not proceeding.");
+            Console.WriteLine($"File exists in {savePath}, not proceeding download.");
+            return;
         }
+        
         var directoryPath = Path.GetDirectoryName(savePath);
         if (directoryPath != null)
         {
