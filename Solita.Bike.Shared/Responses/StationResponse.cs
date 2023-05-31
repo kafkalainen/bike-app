@@ -4,7 +4,7 @@ namespace Solita.Bike.Shared.Responses
 {
     public class StationResponse
     {
-        public PaginationMetadata Pagination { get; set; }
-        public List<StationInfo> Response { get; set; }
+        public PaginationMetadata? Pagination { get; set; }
+        public List<StationInfo>? Response { get; set; }
     }
 }
