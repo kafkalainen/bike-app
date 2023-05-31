@@ -1,6 +1,7 @@
-namespace Solita.Bike.Database.Data
+using CsvHelper.Configuration.Attributes;
+
+namespace Solita.Bike.Database
 {
-    using CsvHelper.Configuration.Attributes;
     public class JourneyRecord
     {
         [Name("Departure")]
