@@ -47,7 +47,6 @@ else
         }
         </tbody>
     </table>
-    <div class="btn-lg">@m_stationResponse.Pagination.PageNumber/@m_stationResponse.Pagination.TotalPages</div>
     <div>
         @if (m_stationResponse.Pagination.HasPreviousPage)
         {
@@ -58,14 +57,16 @@ else
             <button class="btn-lg btn" @onclick="OnNextPage">Next</button>
         }
     </div>
+    <div>@m_stationResponse.Pagination.PageNumber/@m_stationResponse.Pagination.TotalPages</div>
     <div>
-        <input type="number" label="Results per page:" @bind="m_pageSize" @oninput="OnPageResize" />
+        <label for="pageSize">Results per page:</label>
+        <input id="pageSize" type="number" label="Results per page:" @bind="PageSize" @onfocusout="OnPageResize"/>
     </div>
 }
 
 @code {
     [CascadingParameter] public IModalService Modal { get; set; } = default!;
-    private int m_pageSize { get; set; }
+    private int PageSize { get; set; }
 
     private StationResponse? m_stationResponse;
     private SingleStationInfo? m_stationInfo;
@@ -73,23 +74,23 @@ else
     protected override async Task OnInitializedAsync()
     {
         m_stationResponse = await BikeService.GetStations();
-        m_pageSize = m_stationResponse.Pagination.PageSize;
+        PageSize = m_stationResponse.Pagination.PageSize;
     }
     
     private async Task OnNextPage()
     {
-        m_stationResponse = await BikeService.GetStations(m_stationResponse!.Pagination.PageNumber + 1, m_pageSize);
+        m_stationResponse = await BikeService.GetStations(m_stationResponse!.Pagination.PageNumber + 1, PageSize);
     }
     
     private async Task OnPreviousPage()
     {
-        m_stationResponse = await BikeService.GetStations(m_stationResponse!.Pagination.PageNumber - 1, m_pageSize);
+        m_stationResponse = await BikeService.GetStations(m_stationResponse!.Pagination.PageNumber - 1, PageSize);
     }
 
     private async Task OnPageResize()
     {
-        m_stationResponse = await BikeService.GetStations(m_stationResponse!.Pagination.PageNumber, m_pageSize);
-        m_pageSize = m_stationResponse.Pagination.PageSize;
+        m_stationResponse = await BikeService.GetStations(m_stationResponse!.Pagination.PageNumber, PageSize);
+        PageSize = m_stationResponse.Pagination.PageSize;
     }
 
     private async Task ShowModal(string id)

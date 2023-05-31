@@ -36,7 +36,6 @@ else
         }
         </tbody>
     </table>
-    <div class="btn-lg">@m_journeyResponse.Pagination.PageNumber/@m_journeyResponse.Pagination.TotalPages</div>
     <div>
         @if (m_journeyResponse.Pagination.HasPreviousPage)
         {
@@ -47,10 +46,16 @@ else
             <button class="btn-lg btn" @onclick="OnNextPage">Next</button>
         }
     </div>
+    <div>@m_journeyResponse.Pagination.PageNumber/@m_journeyResponse.Pagination.TotalPages</div>
+    <div>
+        <label for="pageSize">Results per page:</label>
+        <input id="pageSize" type="number" label="Results per page:" @bind="PageSize" @onfocusout="OnPageResize"/>
+    </div>
 }
 
 @code {
     private JourneyResponse? m_journeyResponse;
+    private int PageSize { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -65,5 +70,11 @@ else
     private async Task OnPreviousPage()
     {
         m_journeyResponse = await BikeService.GetJourneys(m_journeyResponse!.Pagination.PageNumber - 1);
+    }
+    
+    private async Task OnPageResize()
+    {
+        m_journeyResponse = await BikeService.GetJourneys(m_journeyResponse!.Pagination.PageNumber, PageSize);
+        PageSize = m_journeyResponse.Pagination.PageSize;
     }
 }
