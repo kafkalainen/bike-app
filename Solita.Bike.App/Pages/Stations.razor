@@ -1,0 +1,103 @@
+﻿@page "/stations"
+@using Solita.Bike.App.Data
+@using Solita.Bike.Shared.Dtos
+@using Solita.Bike.Shared.Responses
+@inject BikeService BikeService
+
+<PageTitle>Stations</PageTitle>
+
+<h1>Stations</h1>
+
+<p>Fetching stations from the backend service</p>
+
+@if (m_stationResponse == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Station ID: </th>
+            <th>Name: </th>
+            <th>Address: </th>
+            <th>City: </th>
+            <th>Operator: </th>
+            <th>Capacity: </th>
+            <th>Coordinates: </th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var station in m_stationResponse.Response!)
+        {
+            station.Name!.TryGetValue(Localization.Fi, out var name);
+            station.Address!.TryGetValue(Localization.Fi, out var address);
+            station.City!.TryGetValue(Localization.Fi, out var city);
+            <tr>
+                <td>@station.Id</td>
+                <td>@name</td>
+                <td>@address</td>
+                <td>@city</td>
+                <td>@station.Operator</td>
+                <td>@station.Capacity</td>
+                <td>@station.X, @station.Y</td>
+                <td><button class="btn-lg btn" @onclick="() => ShowModal(station.Id!)">View</button></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    <div>
+        @if (m_stationResponse!.Pagination!.HasPreviousPage)
+        {
+            <button class="btn-lg btn" @onclick="OnPreviousPage">Previous</button>
+        }
+        @if (m_stationResponse.Pagination.HasNextPage)
+        {
+            <button class="btn-lg btn" @onclick="OnNextPage">Next</button>
+        }
+    </div>
+    <div>@m_stationResponse.Pagination.PageNumber/@m_stationResponse.Pagination.TotalPages</div>
+    <div>
+        <label for="pageSize">Results per page:</label>
+        <input id="pageSize" type="number" label="Results per page:" @bind="PageSize" @onfocusout="OnPageResize"/>
+    </div>
+}
+
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
+    private int PageSize { get; set; }
+
+    private StationResponse? m_stationResponse;
+    private SingleStationInfo? m_stationInfo;
+
+    protected override async Task OnInitializedAsync()
+    {
+        m_stationResponse = await BikeService.GetStations();
+        PageSize = m_stationResponse!.Pagination!.PageSize;
+    }
+    
+    private async Task OnNextPage()
+    {
+        m_stationResponse = await BikeService.GetStations(m_stationResponse!.Pagination!.PageNumber + 1, PageSize);
+    }
+    
+    private async Task OnPreviousPage()
+    {
+        m_stationResponse = await BikeService.GetStations(m_stationResponse!.Pagination!.PageNumber - 1, PageSize);
+    }
+
+    private async Task OnPageResize()
+    {
+        m_stationResponse = await BikeService.GetStations(m_stationResponse!.Pagination!.PageNumber, PageSize);
+        PageSize = m_stationResponse.Pagination!.PageSize;
+    }
+
+    private async Task ShowModal(string id)
+    {
+        m_stationInfo = await BikeService.GetStation(id);
+        var parameters = new ModalParameters()
+            .Add(nameof(SingleStationModal.SingleStationInfo), m_stationInfo);
+        Modal.Show<SingleStationModal>("Station Info", parameters);
+    }
+}

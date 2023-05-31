@@ -1,5 +1,8 @@
+data/
 bin/
 obj/
 .env
-appsettings.json
-appsettings.Development.json
+Solita.Bike.Database/Data/Journeys/
+Solita.Bike.Database/Data/Stations/
+.idea/
+Solita.Bike.sln.DotSettings.User
