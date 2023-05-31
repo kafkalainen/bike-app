@@ -1,6 +1,6 @@
 # Solita.Bike
 ## Description of the project
-`Solita.Bike` is an application that displays views on Helsinki Capital area.bicycle stations, and the journeys that have been traveled between those stations. 
+`Solita.Bike` is an application that displays views on Helsinki Capital area bicycle stations, and the journeys that have been traveled between those stations. 
 It has API, Database project, Application to consume API endpoints and Shared library for handling Responses and Dtos. You can use Docker launch the entire stack.
 
 ## Features
