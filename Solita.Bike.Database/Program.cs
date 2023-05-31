@@ -2,99 +2,130 @@
 using System.Globalization;
 using CsvHelper;
 using Microsoft.EntityFrameworkCore;
-using Solita.Bike.Database.Data;
+using Solita.Bike.Database;
 using Solita.Bike.Shared;
 using Solita.Bike.Shared.Models;
 
-await using var context = new BikeDbContext();
-
-foreach (var file in Directory.GetFiles("Data/Stations"))
+var downloader = new FileDownloader();
+var downloadTasks = new List<Task>
 {
-    if (context.DataImports.Any(di => di.FileName == file))
-    {
-        Console.WriteLine($"Data from {file} has already been imported. Skipping.");
-        continue;
-    }
+    downloader.DownloadFile("https://opendata.arcgis.com/datasets/726277c507ef4914b0aec3cbcfcbfafc_0.csv",
+        "Data/Stations/Espoon_ja_Helsingin_Kaupunkipyoraasemat_avoin.csv"),
+    downloader.DownloadFile("https://dev.hsl.fi/citybikes/od-trips-2021/2021-05.csv",
+        "Data/Journeys/2021-05.csv"),
+    downloader.DownloadFile("https://dev.hsl.fi/citybikes/od-trips-2021/2021-06.csv",
+        "Data/Journeys/2021-06.csv"),
+    downloader.DownloadFile("https://dev.hsl.fi/citybikes/od-trips-2021/2021-07.csv",
+        "Data/Journeys/2021-07.csv")
+};
 
-    using var reader = new StreamReader(file);
-    using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-    var records = csv.GetRecords<StationRecord>();
 
-    foreach (var record in records)
+await Task.WhenAll(downloadTasks);
+
+await using var context = new BikeDbContext();
+await ImportStations(context);
+await ImportJourneys(context);
+
+async Task ImportStations(BikeDbContext dbContext)
+{
+    foreach (var file in Directory.GetFiles("Data/Stations"))
     {
-        var station = new Station
+        if (dbContext.DataImports.Any(di => di.FileName == file))
         {
-            Fid = record.Fid,
-            Id = record.Id,
-            NameInFinnish = record.NameInFinnish,
-            NameInEnglish = record.NameInEnglish,
-            NameInSwedish = record.NameInSwedish,
-            AddressInFinnish = record.AddressInFinnish,
-            AddressInSwedish = record.AddressInSwedish,
-            CityInFinnish = record.CityInFinnish,
-            CityInSwedish = record.CityInSwedish,
-            Operator = record.Operator,
-            Capacity = record.Capacity,
-            X = record.X,
-            Y = record.Y
-        };
-        await context.Stations.AddAsync(station);
-    }
+            Console.WriteLine($"Data from {file} has already been imported. Skipping.");
+            continue;
+        }
 
-    await context.DataImports.AddAsync(new DataImport { FileName = file, ImportDate = DateTime.UtcNow });
-    await context.SaveChangesAsync();
+        using var reader = new StreamReader(file);
+        using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+        var records = csv.GetRecords<StationRecord>();
+
+        foreach (var record in records)
+        {
+            var station = new Station
+            {
+                Fid = record.Fid,
+                Id = record.Id,
+                NameInFinnish = record.NameInFinnish,
+                NameInEnglish = record.NameInEnglish,
+                NameInSwedish = record.NameInSwedish,
+                AddressInFinnish = record.AddressInFinnish,
+                AddressInSwedish = record.AddressInSwedish,
+                CityInFinnish = record.CityInFinnish,
+                CityInSwedish = record.CityInSwedish,
+                Operator = record.Operator,
+                Capacity = record.Capacity,
+                X = record.X,
+                Y = record.Y
+            };
+            await dbContext.Stations.AddAsync(station);
+        }
+
+        await dbContext.DataImports.AddAsync(new DataImport { FileName = file, ImportDate = DateTime.UtcNow });
+        await dbContext.SaveChangesAsync();
+        Console.WriteLine($"Data from {file} has been imported.");
+    }
 }
 
-foreach (var file in Directory.GetFiles("Data/Journeys"))
+async Task ImportJourneys(BikeDbContext dbContext)
 {
-    if (context.DataImports.Any(di => di.FileName == file))
+    foreach (var file in Directory.GetFiles("Data/Journeys"))
     {
-        Console.WriteLine($"Data from {file} has already been imported. Skipping.");
-        continue;
-    }
-
-    using var reader = new StreamReader(file);
-    using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-    var records = csv.GetRecords<JourneyRecord>();
+        if (dbContext.DataImports.Any(di => di.FileName == file))
+        {
+            Console.WriteLine($"Data from {file} has already been imported. Skipping.");
+            continue;
+        }
     
-    foreach (var record in records)
-    {
-        var journey = new Journey
-        {
-            Departure = record.Departure,
-            Return = record.Return,
-            DepartureStationId = record.DepartureStationId,
-            DepartureStationName = record.DepartureStationName,
-            ReturnStationId = record.ReturnStationId,
-            ReturnStationName = record.ReturnStationName,
-            CoveredDistanceInMeters = record.CoveredDistance,
-            DurationInSeconds = record.Duration
-        };
-        var validationResults = new List<ValidationResult>();
-        var validationContext = new ValidationContext(journey);
-
-        var exists = await context.Stations.AnyAsync(s => record.DepartureStationId == s.Id);
-        if (!exists)
-        {
-            continue;
-        }
+        using var reader = new StreamReader(file);
+        using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+        var records = csv.GetRecords<JourneyRecord>();
         
-        exists = await context.Stations.AnyAsync(s => record.ReturnStationId == s.Id);
-        if (!exists)
+        foreach (var record in records)
         {
-            continue;
+            var journey = new Journey
+            {
+                Departure = record.Departure,
+                Return = record.Return,
+                DepartureStationId = record.DepartureStationId,
+                DepartureStationName = record.DepartureStationName,
+                ReturnStationId = record.ReturnStationId,
+                ReturnStationName = record.ReturnStationName,
+                CoveredDistanceInMeters = record.CoveredDistance,
+                DurationInSeconds = record.Duration
+            };
+            var validationResults = new List<ValidationResult>();
+            var validationContext = new ValidationContext(journey);
+    
+            if (!Validator.TryValidateObject(journey, validationContext, validationResults, true))
+            {
+                continue;
+            }
+            
+            await dbContext.Journeys.AddAsync(journey);
         }
-        
-        if (!Validator.TryValidateObject(journey, validationContext, validationResults, true))
+    
+        await dbContext.DataImports.AddAsync(new DataImport { FileName = file, ImportDate = DateTime.UtcNow });
+        try
         {
-            continue;
+            dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
+            await dbContext.SaveChangesAsync();
+            dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
         }
-        
-        await context.Journeys.AddAsync(journey);
+        catch (DbUpdateException e)
+        {
+            Console.WriteLine(e);
+            foreach (var entry in e.Entries)
+            {
+                Console.WriteLine($"Entity Type: {entry.Entity.GetType().Name}");
+                foreach (var property in entry.Properties)
+                {
+                    Console.WriteLine($"Property: {property.Metadata.Name}, Value: {property.CurrentValue}");
+                }
+            }
+        }
+        Console.WriteLine($"Data from {file} has been imported.");
     }
-
-    await context.DataImports.AddAsync(new DataImport { FileName = file, ImportDate = DateTime.UtcNow });
-    await context.SaveChangesAsync();
 }
 
 Console.WriteLine("All data has been successfully imported.");
