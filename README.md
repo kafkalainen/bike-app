@@ -1,21 +1,20 @@
 # Solita.Bike
 ## Description of the project
-`Solita.Bike` is an application that displays views on Helsinki and Vantaa bicycle stations, and the journeys that have been traveled between those stations. 
+`Solita.Bike` is an application that displays views on Helsinki Capital area.bicycle stations, and the journeys that have been traveled between those stations. 
 It has API, Database project, Application to consume API endpoints and Shared library for handling Responses and Dtos. You can use Docker launch the entire stack.
 
 ## Features
 
 ### Data Import
-- Import data from the CSV files to a database or in-memory storage
+- Import data from the CSV files to a MySQL database
 - Validate data before importing
 - Don't import journeys that lasted for less than ten seconds
 - Don't import journeys that covered distances shorter than 10 meters
-
 - Data Import is implemented in `Solita.Bike.Database` project.
 
-### Extra:
-- Shows percentage of the import for journeys, and the time it took for the import.
+*Extra implemented:*
 - Downloading the csv files to container.
+- Shows percentage of the import for journeys, and the time it took for the import.
 
 ### List journeys
 - For each journey show departure and return stations, covered distance in kilometers and duration in minutes
@@ -37,7 +36,7 @@ It has API, Database project, Application to consume API endpoints and Shared li
 
 - Single stations view is visible at http://localhost:2341/stations, and clicking `View` button. Its been implemented in `Solita.Bike.Api` and `Solita.Bike.App` projects.
 
-### Suprising elements
+### Extra
 - Running backend in Docker
 
 ## Technology choices
