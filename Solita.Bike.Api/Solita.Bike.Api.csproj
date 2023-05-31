@@ -17,6 +17,8 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Solita.Bike.Database\Solita.Bike.Database.csproj" />
+      <ProjectReference Include="..\Solita.Bike.Profiles\Solita.Bike.Profiles.csproj" />
       <ProjectReference Include="..\Solita.Bike.Shared\Solita.Bike.Shared.csproj" />
     </ItemGroup>
 
